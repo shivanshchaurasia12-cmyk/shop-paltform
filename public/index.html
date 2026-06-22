@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Shops - Customer Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="account-bar"></div>
+
+  <h1>Welcome! Choose a Shop</h1>
+  <p>Click on any shop below to view its products.</p>
+
+  <div id="shop-list">
+    <p>Loading shops...</p>
+  </div>
+
+  <script>
+    // Show login link or account info at the top
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+    const accountBar = document.getElementById('account-bar');
+
+    if (loggedInCustomer) {
+      accountBar.innerHTML = `
+        <p>Hi, ${loggedInCustomer.name}! 
+          <a href="my-orders.html">My Orders</a> | 
+          <a href="#" id="logout-link">Logout</a>
+        </p>
+      `;
+      document.getElementById('logout-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        sessionStorage.removeItem('loggedInCustomer');
+        window.location.reload();
+      });
+    } else {
+      accountBar.innerHTML = `<p><a href="customer-login.html">Customer Login</a> | <a href="login.html">Shop Owner Login</a></p>`;
+    }
+
+    fetch('/api/shops')
+      .then(response => response.json())
+      .then(shops => {
+        const container = document.getElementById('shop-list');
+
+        if (shops.length === 0) {
+          container.innerHTML = '<p>No shops available right now.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+
+        shops.forEach(shop => {
+          const card = document.createElement('div');
+          card.className = 'shop-card';
+          card.innerText = shop.name;
+
+          card.addEventListener('click', () => {
+            window.location.href = 'shop.html?id=' + shop.id;
+          });
+
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching shops:', error);
+        document.getElementById('shop-list').innerHTML = '<p>Failed to load shops.</p>';
+      });
+  </script>
+
+</body>
+</html>

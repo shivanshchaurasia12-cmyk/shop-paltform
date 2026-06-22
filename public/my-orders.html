@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a href="index.html">&larr; Back to all shops</a>
+
+  <h1>My Orders</h1>
+
+  <div id="orders-list">
+    <p>Loading your orders...</p>
+  </div>
+
+  <script>
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+
+    if (!loggedInCustomer) {
+      window.location.href = 'customer-login.html';
+    } else {
+      fetch('/api/customer-orders/' + loggedInCustomer.id)
+        .then(res => res.json())
+        .then(orders => {
+          const container = document.getElementById('orders-list');
+
+          if (orders.length === 0) {
+            container.innerHTML = '<p>You haven\'t placed any orders yet.</p>';
+            return;
+          }
+
+          container.innerHTML = '';
+          orders.reverse().forEach(order => {
+            const row = document.createElement('div');
+            row.className = 'order-card';
+            row.innerHTML = `
+              <p><strong>${order.productName}</strong></p>
+              <p>Status: ${order.status}</p>
+              <p style="font-size:12px;color:#777;">${order.createdAt}</p>
+            `;
+            container.appendChild(row);
+          });
+        });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop Owner Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Shop Owner Login</h1>
+  <p>Enter your shop name and password.</p>
+
+  <form id="login-form">
+    <input type="text" id="login-shop-name" placeholder="Shop Name" required><br><br>
+    <input type="password" id="login-password" placeholder="Password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <p id="result-message"></p>
+  <p><a href="register.html">Don't have a shop yet? Register here</a></p>
+
+  <script>
+    const form = document.getElementById('login-form');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('login-shop-name').value;
+      const password = document.getElementById('login-password').value;
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, password: password })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Save logged-in shop info so dashboard.html can use it
+            sessionStorage.setItem('loggedInShop', JSON.stringify(data.shop));
+            window.location.href = 'dashboard.html';
+          } else {
+            document.getElementById('result-message').innerText = '❌ ' + data.message;
+          }
+        })
+        .catch(error => {
+          document.getElementById('result-message').innerText = '❌ Something went wrong.';
+          console.error(error);
+        });
+    });
+  </script>
+
+</body>
+</html>

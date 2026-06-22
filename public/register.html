@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Your Shop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Register Your Shop</h1>
+  <p>Fill in the details below to add your shop to the platform.</p>
+
+  <form id="register-form">
+    <input type="text" id="shop-name" placeholder="Shop Name" required><br><br>
+    <input type="text" id="owner-name" placeholder="Owner Name" required><br><br>
+    <input type="password" id="shop-password" placeholder="Create a Password" required><br><br>
+    <button type="submit">Register Shop</button>
+  </form>
+
+  <p id="result-message"></p>
+  <p><a href="login.html">Already have a shop? Login here</a></p>
+
+  <script>
+    const form = document.getElementById('register-form');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const shopName = document.getElementById('shop-name').value;
+      const ownerName = document.getElementById('owner-name').value;
+      const password = document.getElementById('shop-password').value;
+
+      fetch('/api/shops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: shopName, owner: ownerName, password: password })
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('result-message').innerText =
+            '✅ ' + data.shop.name + ' registered successfully! You can now login.';
+          form.reset();
+        })
+        .catch(error => {
+          document.getElementById('result-message').innerText = '❌ Something went wrong.';
+          console.error(error);
+        });
+    });
+  </script>
+
+</body>
+</html>

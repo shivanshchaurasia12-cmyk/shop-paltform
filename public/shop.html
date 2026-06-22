@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop Details</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .back-link { display:inline-block; padding:16px 32px 8px; color:var(--muted); font-size:13px; position:relative; z-index:1; }
+
+    .shop-hero {
+      display: flex; align-items: center; gap: 18px;
+      padding: 20px 32px 0;
+      position: relative; z-index: 1;
+    }
+    .shop-hero-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--accent);
+      box-shadow: 0 0 16px rgba(0,255,178,0.3);
+    }
+    .shop-hero-placeholder {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--panel); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; flex-shrink: 0;
+    }
+    .shop-hero-info { text-align: left; }
+    .shop-hero-info h1 { margin: 0; font-size: 24px; }
+    .shop-hero-info p  { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    #order-popup {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; padding: 16px;
+    }
+    .popup-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      text-align: left;
+    }
+    .popup-box h3 { margin: 0 0 4px; font-size: 18px; font-family: 'Space Grotesk', sans-serif; }
+    .popup-unit-price { color: var(--accent); font-weight: 700; font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin-bottom: 14px; }
+    .qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .qty-row label { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .qty-row input { width: 80px; margin: 0; }
+    .total-box {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;
+    }
+    .total-box span { color: var(--accent); }
+    .popup-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .popup-box input[type="text"],
+    .popup-box textarea { margin-bottom: 10px; }
+
+    #qr-pay-section {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+      margin-bottom: 14px; text-align: center; display: none;
+    }
+    #qr-pay-section p { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+    #shop-qr-img { max-width: 150px; border-radius: 8px; border: 1px solid var(--border); }
+
+    .popup-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .popup-actions button { flex: 1; }
+    .btn-cancel { background: transparent !important; color: var(--muted) !important; border: 1px solid var(--border) !important; box-shadow: none !important; }
+    .btn-cancel:hover { border-color: var(--accent-2) !important; color: var(--text) !important; }
+
+    #order-result-message { margin-top: 12px; font-size: 14px; min-height: 20px; }
+    .receipt-btn {
+      display: inline-block; margin-top: 10px;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, var(--accent), #00c98a);
+      color: #07120d; font-weight: 700; border-radius: 8px;
+      font-size: 13px; text-decoration: none;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .receipt-btn:hover { text-decoration: none; box-shadow: 0 4px 16px rgba(0,255,178,0.35); }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">← Back to all shops</a>
+  <div id="shop-hero-wrap"></div>
+  <div id="shop-details" style="position:relative;z-index:1;">
+    <p style="padding:20px;color:var(--muted);">Loading shop...</p>
+  </div>
+
+  <div id="order-popup">
+    <div class="popup-box">
+      <h3 id="order-product-name"></h3>
+      <div class="popup-unit-price" id="order-unit-price"></div>
+
+      <div class="qty-row">
+        <label for="order-quantity">Quantity</label>
+        <input type="number" id="order-quantity" value="1" min="1">
+      </div>
+      <div class="total-box">Total: <span id="order-total-text">₹0</span></div>
+
+      <hr class="popup-divider">
+
+      <input type="text" id="customer-name" placeholder="Your name" required>
+      <input type="text" id="customer-phone" placeholder="Phone number" required>
+      <textarea id="customer-address" placeholder="Delivery address" rows="2" required></textarea>
+
+      <hr class="popup-divider">
+
+      <div id="qr-pay-section">
+        <p>Scan to pay this shop directly:</p>
+        <img id="shop-qr-img" src="" alt="Payment QR">
+      </div>
+
+      <div id="order-result-message"></div>
+
+      <div class="popup-actions">
+        <button id="cancel-order-btn" class="btn-cancel">Cancel</button>
+        <button id="confirm-order-btn">Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const shopId = params.get('id');
+    let selectedProduct = null;
+    let currentShop = null;
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+
+    fetch('/api/shops')
+      .then(r => r.json())
+      .then(shops => {
+        const shop = shops.find(s => s.id == shopId);
+        if (!shop) {
+          document.getElementById('shop-details').innerHTML = '<p style="padding:20px;color:var(--muted)">Shop not found.</p>';
+          return;
+        }
+        currentShop = shop;
+
+        const heroWrap = document.getElementById('shop-hero-wrap');
+        heroWrap.className = 'shop-hero';
+        heroWrap.innerHTML = shop.avatar
+          ? `<img class="shop-hero-avatar" src="${shop.avatar}" alt="${shop.name}">
+             <div class="shop-hero-info"><h1>${shop.name}</h1><p>Owner: ${shop.owner}</p></div>`
+          : `<div class="shop-hero-placeholder">🏪</div>
+             <div class="shop-hero-info"><h1>${shop.name}</h1><p>Owner: ${shop.owner}</p></div>`;
+
+        return fetch('/api/products/' + shop.id);
+      })
+      .then(r => r ? r.json() : null)
+      .then(products => {
+        if (!products) return;
+        const container = document.getElementById('shop-details');
+        if (!products.length) {
+          container.innerHTML = '<p style="padding:20px;color:var(--muted)">No products yet.</p>';
+          return;
+        }
+        container.innerHTML = '<div id="product-list"></div>';
+        const grid = document.getElementById('product-list');
+        grid.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:20px;padding:24px 20px 40px;';
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p class="price">₹${product.price}</p>
+            <p>Stock: ${product.quantity}</p>
+            <button class="order-btn">Order Now</button>`;
+          card.querySelector('.order-btn').addEventListener('click', () => openPopup(product));
+          grid.appendChild(card);
+        });
+      })
+      .catch(() => {
+        document.getElementById('shop-details').innerHTML = '<p style="padding:20px;color:var(--muted)">Failed to load shop.</p>';
+      });
+
+    function openPopup(product) {
+      selectedProduct = product;
+      document.getElementById('order-product-name').innerText = product.name;
+      document.getElementById('order-unit-price').innerText = '₹' + product.price + ' per unit';
+      document.getElementById('order-quantity').value = 1;
+      updateTotal();
+
+      document.getElementById('customer-name').value    = loggedInCustomer ? loggedInCustomer.name    : '';
+      document.getElementById('customer-phone').value   = loggedInCustomer ? loggedInCustomer.phone   : '';
+      document.getElementById('customer-address').value = loggedInCustomer ? loggedInCustomer.address : '';
+
+      const qrSection = document.getElementById('qr-pay-section');
+      if (currentShop && currentShop.qrImage) {
+        document.getElementById('shop-qr-img').src = currentShop.qrImage;
+        qrSection.style.display = 'block';
+      } else {
+        qrSection.style.display = 'none';
+      }
+
+      document.getElementById('order-result-message').innerHTML = '';
+      document.getElementById('confirm-order-btn').disabled = false;
+      document.getElementById('confirm-order-btn').innerText = 'Place Order';
+      document.getElementById('order-popup').style.display = 'flex';
+    }
+
+    document.getElementById('order-quantity').addEventListener('input', updateTotal);
+
+    function updateTotal() {
+      if (!selectedProduct) return;
+      const qty   = Math.max(1, parseInt(document.getElementById('order-quantity').value) || 1);
+      const total = qty * parseFloat(selectedProduct.price);
+      document.getElementById('order-total-text').innerText = '₹' + total;
+    }
+
+    document.getElementById('cancel-order-btn').addEventListener('click', () => {
+      document.getElementById('order-popup').style.display = 'none';
+    });
+
+    document.getElementById('confirm-order-btn').addEventListener('click', () => {
+      const name    = document.getElementById('customer-name').value.trim();
+      const phone   = document.getElementById('customer-phone').value.trim();
+      const address = document.getElementById('customer-address').value.trim();
+      const qty     = Math.max(1, parseInt(document.getElementById('order-quantity').value) || 1);
+
+      if (!name || !phone || !address) {
+        document.getElementById('order-result-message').innerText = 'Please fill in all fields.';
+        return;
+      }
+
+      const btn = document.getElementById('confirm-order-btn');
+      btn.disabled = true;
+      btn.innerText = 'Placing...';
+
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId, customerId: loggedInCustomer ? loggedInCustomer.id : null,
+          productId: selectedProduct.id, productName: selectedProduct.name,
+          price: selectedProduct.price, quantity: qty,
+          customerName: name, customerPhone: phone, customerAddress: address
+        })
+      })
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('order-result-message').innerHTML =
+            '✅ Order placed!<br><a class="receipt-btn" href="/api/orders/' + data.order.id + '/receipt" target="_blank">⬇ Download Receipt (PDF)</a>';
+          btn.innerText = 'Ordered ✓';
+        })
+        .catch(() => {
+          document.getElementById('order-result-message').innerText = '❌ Something went wrong.';
+          btn.disabled = false; btn.innerText = 'Place Order';
+        });
+    });
+  </script>
+</body>
+</html>

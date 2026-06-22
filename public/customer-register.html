@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Customer Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Create Your Account</h1>
+  <p>Save your details so you don't have to type them every time.</p>
+
+  <form id="customer-register-form">
+    <input type="text" id="cust-name" placeholder="Your Name" required><br><br>
+    <input type="text" id="cust-phone" placeholder="Phone Number" required><br><br>
+    <input type="password" id="cust-password" placeholder="Create a Password" required><br><br>
+    <textarea id="cust-address" placeholder="Your Address" rows="3" required></textarea><br><br>
+    <button type="submit">Create Account</button>
+  </form>
+
+  <p id="result-message"></p>
+  <p><a href="customer-login.html">Already have an account? Login here</a></p>
+
+  <script>
+    document.getElementById('customer-register-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('cust-name').value;
+      const phone = document.getElementById('cust-phone').value;
+      const password = document.getElementById('cust-password').value;
+      const address = document.getElementById('cust-address').value;
+
+      fetch('/api/customer/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, password, address })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.setItem('loggedInCustomer', JSON.stringify(data.customer));
+            document.getElementById('result-message').innerText = '✅ Account created! Redirecting...';
+            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+          } else {
+            document.getElementById('result-message').innerText = '❌ ' + data.message;
+          }
+        })
+        .catch(err => {
+          document.getElementById('result-message').innerText = '❌ Something went wrong.';
+        });
+    });
+  </script>
+
+</body>
+</html>

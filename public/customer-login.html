@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Customer Login</h1>
+  <p>Enter your phone number and password.</p>
+
+  <form id="customer-login-form">
+    <input type="text" id="login-phone" placeholder="Phone Number" required><br><br>
+    <input type="password" id="login-password" placeholder="Password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <p id="result-message"></p>
+  <p><a href="customer-register.html">New here? Create an account</a></p>
+
+  <script>
+    document.getElementById('customer-login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const phone = document.getElementById('login-phone').value;
+      const password = document.getElementById('login-password').value;
+
+      fetch('/api/customer/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.setItem('loggedInCustomer', JSON.stringify(data.customer));
+            window.location.href = 'index.html';
+          } else {
+            document.getElementById('result-message').innerText = '❌ ' + data.message;
+          }
+        })
+        .catch(err => {
+          document.getElementById('result-message').innerText = '❌ Something went wrong.';
+        });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Shop Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .dash-header {
+      background: linear-gradient(135deg, #0f1320 0%, #161226 100%);
+      border-bottom: 1px solid #232b3d;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .dash-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 14px rgba(0,255,178,0.35);
+    }
+    .dash-avatar-placeholder {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--panel-2);
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+    }
+    .dash-header-info { text-align: left; flex: 1; }
+    .dash-header-info h1 { margin: 0; font-size: 22px; }
+    .dash-header-info p  { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .dash-logout { color: var(--accent-2) !important; font-size: 13px; }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 28px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: left;
+      position: relative; z-index: 1;
+    }
+    @media (max-width: 720px) {
+      .dash-grid { grid-template-columns: 1fr; padding: 16px; }
+      .dash-header { padding: 16px; }
+    }
+
+    .dash-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+    }
+    .dash-card h2 {
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .dash-card.full-width { grid-column: 1 / -1; }
+    .dash-card form { background: none; border: none; padding: 0; margin: 0; box-shadow: none; max-width: 100%; }
+    .dash-card input[type="text"],
+    .dash-card input[type="number"],
+    .dash-card input[type="file"] { margin-bottom: 10px; }
+    .dash-card button { margin-top: 4px; width: 100%; }
+
+    .dash-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .dash-product-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .dash-product-card img {
+      width: 100%; height: 75px;
+      object-fit: cover; border-radius: 7px;
+      border: 1px solid var(--border); margin-bottom: 6px;
+    }
+    .dash-product-card .p-name  { font-weight: 600; color: var(--text); margin: 4px 0 2px; }
+    .dash-product-card .p-price { color: var(--accent); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+    .dash-product-card .p-stock { color: var(--muted); font-size: 11px; }
+
+    .order-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .order-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .oc-product { font-weight: 700; font-size: 15px; color: var(--text); }
+    .oc-total   { color: var(--accent); font-weight: 700; font-family: 'Space Grotesk', sans-serif; font-size: 15px; }
+    .oc-meta    { color: var(--muted); line-height: 1.8; }
+    .oc-time    { font-size: 11px; color: #555; margin-top: 6px; }
+    .badge {
+      display: inline-block;
+      background: rgba(0,255,178,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,255,178,0.3);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 11px; font-weight: 600;
+    }
+    .receipt-link {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--accent-2);
+      font-size: 12px; font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--accent-2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      transition: box-shadow 0.2s;
+    }
+    .receipt-link:hover { box-shadow: 0 0 10px rgba(124,77,255,0.4); text-decoration: none; }
+
+    #current-qr { border-radius: 8px; border: 1px solid var(--border); display: block; margin-bottom: 8px; }
+    #current-avatar-preview {
+      border-radius: 50%; border: 2px solid var(--accent);
+      display: none; width: 70px; height: 70px;
+      object-fit: cover; margin-bottom: 10px;
+    }
+    .section-label { color: var(--muted); font-size: 12px; margin: 0 0 8px; }
+    .result-msg { font-size: 13px; margin-top: 8px; min-height: 18px; color: var(--accent); }
+    .empty-state { color: var(--muted); font-size: 14px; padding: 8px 0; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="dash-header">
+    <div id="avatar-wrap">
+      <div class="dash-avatar-placeholder" id="avatar-placeholder">🏪</div>
+      <img class="dash-avatar" id="avatar-img" src="" alt="Shop" style="display:none;">
+    </div>
+    <div class="dash-header-info">
+      <h1 id="shop-title">My Shop</h1>
+      <p id="shop-owner-text"></p>
+    </div>
+    <a href="#" id="logout-link" class="dash-logout">Logout</a>
+  </div>
+
+  <div class="dash-grid">
+
+    <!-- Add Product -->
+    <div class="dash-card">
+      <h2>Add New Product</h2>
+      <form id="product-form">
+        <input type="text" id="product-name" placeholder="Product name e.g. Rice 1kg" required>
+        <input type="number" id="product-price" placeholder="Price e.g. 60" required>
+        <input type="number" id="product-quantity" placeholder="Stock quantity e.g. 100" required>
+        <input type="file" id="product-image" accept="image/*" required>
+        <button type="submit">+ Add Product</button>
+      </form>
+      <p class="result-msg" id="result-message"></p>
+    </div>
+
+    <!-- Settings -->
+    <div class="dash-card">
+      <h2>Shop Settings</h2>
+
+      <p class="section-label">Payment QR Code</p>
+      <img id="current-qr" src="" alt="QR" style="max-width:130px;display:none;">
+      <p id="qr-status-text" class="section-label"></p>
+      <form id="qr-form">
+        <input type="file" id="qr-image" accept="image/*" required>
+        <button type="submit">Upload QR Code</button>
+      </form>
+      <p class="result-msg" id="qr-result-message"></p>
+
+      <hr class="divider">
+
+      <p class="section-label">Shop Profile Photo</p>
+      <img id="current-avatar-preview" src="" alt="Avatar">
+      <form id="avatar-form">
+        <input type="file" id="avatar-image" accept="image/*" required>
+        <button type="submit">Update Photo</button>
+      </form>
+      <p class="result-msg" id="avatar-result-message"></p>
+    </div>
+
+    <!-- Products -->
+    <div class="dash-card full-width">
+      <h2>My Products</h2>
+      <div class="dash-products" id="product-list">
+        <p class="empty-state">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="dash-card full-width">
+      <h2>Incoming Orders</h2>
+      <div id="order-list">
+        <p class="empty-state">Loading...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const loggedInShop = JSON.parse(sessionStorage.getItem('loggedInShop'));
+    if (!loggedInShop) { window.location.href = 'login.html'; }
+    else {
+      document.getElementById('shop-title').innerText = loggedInShop.name;
+      document.getElementById('shop-owner-text').innerText = 'Owner: ' + loggedInShop.owner;
+      loadAvatar(); loadQR(); loadProducts(); loadOrders();
+    }
+
+    document.getElementById('logout-link').addEventListener('click', e => {
+      e.preventDefault();
+      sessionStorage.removeItem('loggedInShop');
+      window.location.href = 'login.html';
+    });
+
+    function loadAvatar() {
+      if (loggedInShop.avatar) {
+        const img = document.getElementById('avatar-img');
+        img.src = loggedInShop.avatar; img.style.display = 'block';
+        document.getElementById('avatar-placeholder').style.display = 'none';
+        const prev = document.getElementById('current-avatar-preview');
+        prev.src = loggedInShop.avatar; prev.style.display = 'block';
+      }
+    }
+
+    function loadQR() {
+      if (loggedInShop.qrImage) {
+        const img = document.getElementById('current-qr');
+        img.src = loggedInShop.qrImage; img.style.display = 'block';
+        document.getElementById('qr-status-text').innerText = 'Current QR above. Upload new to replace.';
+      } else {
+        document.getElementById('qr-status-text').innerText = 'No QR yet — customers won\'t see payment option.';
+      }
+    }
+
+    document.getElementById('qr-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('qrImage', document.getElementById('qr-image').files[0]);
+      fetch('/api/shops/' + loggedInShop.id + '/qr', { method: 'POST', body: fd })
+        .then(r => r.json()).then(data => {
+          document.getElementById('qr-result-message').innerText = '✅ QR updated!';
+          loggedInShop.qrImage = data.shop.qrImage;
+          sessionStorage.setItem('loggedInShop', JSON.stringify(loggedInShop));
+          loadQR(); document.getElementById('qr-form').reset();
+        }).catch(() => document.getElementById('qr-result-message').innerText = '❌ Failed.');
+    });
+
+    document.getElementById('avatar-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('avatar', document.getElementById('avatar-image').files[0]);
+      fetch('/api/shops/' + loggedInShop.id + '/avatar', { method: 'POST', body: fd })
+        .then(r => r.json()).then(data => {
+          document.getElementById('avatar-result-message').innerText = '✅ Photo updated!';
+          loggedInShop.avatar = data.shop.avatar;
+          sessionStorage.setItem('loggedInShop', JSON.stringify(loggedInShop));
+          loadAvatar(); document.getElementById('avatar-form').reset();
+        }).catch(() => document.getElementById('avatar-result-message').innerText = '❌ Failed.');
+    });
+
+    function loadProducts() {
+      fetch('/api/products/' + loggedInShop.id)
+        .then(r => r.json()).then(products => {
+          const c = document.getElementById('product-list');
+          if (!products.length) { c.innerHTML = '<p class="empty-state">No products yet.</p>'; return; }
+          c.innerHTML = '';
+          products.forEach(p => {
+            const d = document.createElement('div');
+            d.className = 'dash-product-card';
+            d.innerHTML = `<img src="${p.image}" alt="${p.name}">
+              <div class="p-name">${p.name}</div>
+              <div class="p-price">₹${p.price}</div>
+              <div class="p-stock">Stock: ${p.quantity}</div>`;
+            c.appendChild(d);
+          });
+        });
+    }
+
+    function loadOrders() {
+      fetch('/api/orders/' + loggedInShop.id)
+        .then(r => r.json()).then(orders => {
+          const c = document.getElementById('order-list');
+          if (!orders.length) { c.innerHTML = '<p class="empty-state">No orders yet — they\'ll appear here instantly.</p>'; return; }
+          c.innerHTML = '';
+          [...orders].reverse().forEach(order => {
+            const d = document.createElement('div');
+            d.className = 'order-card';
+            d.innerHTML = `
+              <div class="order-card-top">
+                <span class="oc-product">${order.productName}</span>
+                <span class="oc-total">₹${order.total || 0}</span>
+              </div>
+              <div class="oc-meta">
+                👤 ${order.customerName} &nbsp;|&nbsp; 📞 ${order.customerPhone}<br>
+                📍 ${order.customerAddress || 'No address'}<br>
+                🛒 ${order.quantity || 1} × ₹${order.price || 0}
+              </div>
+              <div class="oc-time">${order.createdAt}</div>
+              <span class="badge">${order.status}</span><br>
+              <a class="receipt-link" href="/api/orders/${order.id}/receipt" target="_blank">⬇ Download Receipt</a>`;
+            c.appendChild(d);
+          });
+        });
+    }
+
+    document.getElementById('product-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('shopId', loggedInShop.id);
+      fd.append('name',     document.getElementById('product-name').value);
+      fd.append('price',    document.getElementById('product-price').value);
+      fd.append('quantity', document.getElementById('product-quantity').value);
+      fd.append('image',    document.getElementById('product-image').files[0]);
+      fetch('/api/products', { method: 'POST', body: fd })
+        .then(r => r.json()).then(data => {
+          document.getElementById('result-message').innerText = '✅ ' + data.product.name + ' added!';
+          document.getElementById('product-form').reset();
+          loadProducts();
+        }).catch(() => document.getElementById('result-message').innerText = '❌ Something went wrong.');
+    });
+  </script>
+</body>
+</html>
