@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4321882047594138" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Shop-Paltform</title>
+  <meta name="description" content="Learn about Shop-Paltform, a marketplace built to help small local shop owners sell online and let customers order directly from nearby shops.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="account-bar"></div>
+
+  <div class="page-content">
+    <h1>About Us</h1>
+    <p class="subtitle">Helping small shops go online, without the middlemen.</p>
+
+    <h2>Who We Are</h2>
+    <p>Shop-Paltform is a simple online marketplace built for small, local shop owners who want to sell their products online but don't have the time, budget, or technical know-how to build their own website. Instead of asking sellers to figure out payment gateways, hosting, or app development, we give every shop owner a ready-made storefront they can set up in minutes.</p>
+
+    <h2>How It Started</h2>
+    <p>Many small shop owners in local markets sell great products but have no online presence at all. Meanwhile, big marketplaces charge heavy commissions and make it hard for a small seller to stand out. Shop-Paltform was built to close that gap: a lightweight platform where any shop owner can register, list their products with photos, price, and stock, and start receiving orders from nearby customers within the same day.</p>
+
+    <h2>How It Works</h2>
+    <p>Shop owners create an account, upload their product catalog with images and prices, and add their UPI QR code so customers can pay directly. Customers browse the available shops, pick the products they want, and place an order with their name, phone number, and delivery address. Once an order is placed, both the shop owner and the customer get a clear record of the transaction, including a downloadable PDF receipt with the order total.</p>
+
+    <h2>What Makes Us Different</h2>
+    <ul>
+      <li><strong>No hidden commission structure to navigate</strong> — shop owners manage their own pricing and payments directly with customers via UPI.</li>
+      <li><strong>Built for small sellers</strong> — no minimum inventory, no listing fees, no complicated seller dashboards.</li>
+      <li><strong>Simple for customers</strong> — browse shops, place an order, and get an instant receipt, without creating a complicated account.</li>
+    </ul>
+
+    <h2>Our Goal</h2>
+    <p>We want to make it easier for small shop owners to reach customers beyond their own street, and easier for customers to discover and support local businesses. Shop-Paltform is still growing, and we're actively adding new features based on feedback from the shop owners and customers who use it.</p>
+
+    <h2>Get In Touch</h2>
+    <p>Have a question, feedback, or want your shop listed? Visit our <a href="contact.html">Contact Us</a> page — we'd love to hear from you.</p>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">Shop-Paltform</span>
+    <a href="index.html">Home</a> ·
+    <a href="about.html">About Us</a> ·
+    <a href="contact.html">Contact Us</a> ·
+    <a href="terms.html">Terms &amp; Conditions</a> ·
+    <a href="privacy-policy.html">Privacy Policy</a> ·
+    <a href="faq.html">FAQ</a>
+  </footer>
+
+  <script>
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+    const accountBar = document.getElementById('account-bar');
+    if (loggedInCustomer) {
+      accountBar.innerHTML = `<p>Hi, ${loggedInCustomer.name}! <a href="my-orders.html">My Orders</a> | <a href="index.html">Home</a></p>`;
+    } else {
+      accountBar.innerHTML = `<p><a href="customer-login.html">Customer Login</a> | <a href="login.html">Shop Owner Login</a> | <a href="index.html">Home</a></p>`;
+    }
+  </script>
+
+</body>
+</html>
