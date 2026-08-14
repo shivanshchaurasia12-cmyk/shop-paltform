@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4321882047594138" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Shop-Paltform</title>
+  <meta name="description" content="Get in touch with the Shop-Paltform team for support, feedback, or questions about buying or selling on the platform.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="account-bar"></div>
+
+  <div class="page-content">
+    <h1>Contact Us</h1>
+    <p class="subtitle">Questions, feedback, or issues with an order? We're happy to help.</p>
+
+    <div class="info-box">
+      <p><strong>Email:</strong> support@shop-paltform.com</p>
+      <p><strong>Phone / WhatsApp:</strong> +91-XXXXXXXXXX</p>
+      <p><strong>Response time:</strong> We typically reply within 24-48 hours.</p>
+    </div>
+
+    <h2>Send Us a Message</h2>
+    <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+
+    <form id="contact-form">
+      <label for="name">Your Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Your Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="subject">Subject</label>
+      <select id="subject" name="subject">
+        <option value="general">General Question</option>
+        <option value="order">Order Issue</option>
+        <option value="shop">Shop Owner Support</option>
+        <option value="feedback">Feedback / Suggestion</option>
+      </select>
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="5" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+
+    <div id="form-status" style="text-align:center; margin-top: 16px;"></div>
+
+    <h2>Frequently Asked First</h2>
+    <p>Before reaching out, you might find a quick answer on our <a href="faq.html">FAQ page</a> — it covers common questions about ordering, payments, and selling on Shop-Paltform.</p>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">Shop-Paltform</span>
+    <a href="index.html">Home</a> ·
+    <a href="about.html">About Us</a> ·
+    <a href="contact.html">Contact Us</a> ·
+    <a href="terms.html">Terms &amp; Conditions</a> ·
+    <a href="privacy-policy.html">Privacy Policy</a> ·
+    <a href="faq.html">FAQ</a>
+  </footer>
+
+  <script>
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+    const accountBar = document.getElementById('account-bar');
+    if (loggedInCustomer) {
+      accountBar.innerHTML = `<p>Hi, ${loggedInCustomer.name}! <a href="my-orders.html">My Orders</a> | <a href="index.html">Home</a></p>`;
+    } else {
+      accountBar.innerHTML = `<p><a href="customer-login.html">Customer Login</a> | <a href="login.html">Shop Owner Login</a> | <a href="index.html">Home</a></p>`;
+    }
+
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      document.getElementById('form-status').innerHTML =
+        '<p style="color: var(--accent);">Thanks! Your message has been noted. We\'ll get back to you soon.</p>';
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
