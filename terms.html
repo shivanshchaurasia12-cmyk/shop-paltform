@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4321882047594138" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions - Shop-Paltform</title>
+  <meta name="description" content="Terms and conditions for buying and selling on Shop-Paltform, covering accounts, orders, payments, and platform responsibilities.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="account-bar"></div>
+
+  <div class="page-content">
+    <h1>Terms &amp; Conditions</h1>
+    <p class="subtitle">Last updated: August 2026</p>
+
+    <p>Welcome to Shop-Paltform. By creating an account, browsing shops, or placing an order on this website, you agree to the following terms. Please read them carefully before using the platform.</p>
+
+    <h2>1. What Shop-Paltform Is</h2>
+    <p>Shop-Paltform is a marketplace that connects independent shop owners with customers. We provide the platform for shop owners to list products and for customers to place orders directly with those shops. Shop-Paltform itself does not manufacture, stock, or ship any products — each shop owner is responsible for the products they list and the orders they fulfill.</p>
+
+    <h2>2. Accounts</h2>
+    <p>Both shop owners and customers must register with accurate information, including a valid name and contact details. You are responsible for keeping your login details secure and for all activity that happens under your account. If you suspect unauthorized use of your account, contact us immediately.</p>
+
+    <h2>3. Shop Owner Responsibilities</h2>
+    <ul>
+      <li>Product listings (name, price, stock, images) must be accurate and up to date.</li>
+      <li>Prices shown to customers must be final and honored once an order is placed.</li>
+      <li>Shop owners are responsible for fulfilling orders in a reasonable timeframe and communicating any delays.</li>
+      <li>Any UPI QR code or payment details uploaded must belong to the shop owner or their registered business.</li>
+    </ul>
+
+    <h2>4. Customer Responsibilities</h2>
+    <ul>
+      <li>Provide an accurate name, phone number, and delivery address when placing an order.</li>
+      <li>Payments are made directly to the shop owner via the UPI details they provide.</li>
+      <li>Customers should confirm order details before completing payment, since orders are placed directly with the shop, not through a centralized checkout.</li>
+    </ul>
+
+    <h2>5. Payments</h2>
+    <p>Shop-Paltform does not process or hold customer payments. Payments are made directly between the customer and the shop owner using the UPI QR code the shop owner provides. Shop-Paltform is not a party to this payment and cannot reverse, refund, or guarantee any transaction made outside the platform.</p>
+
+    <h2>6. Order Records and Receipts</h2>
+    <p>When an order is placed, the platform generates an order record and a downloadable PDF receipt showing the product, quantity, total price, and delivery details. This receipt is a record of the order placed on the platform; it is not proof of payment received by the shop owner.</p>
+
+    <h2>7. Cancellations, Returns, and Disputes</h2>
+    <p>Cancellation and return policies are set by each individual shop owner, since Shop-Paltform does not hold inventory or process payments. If you have a dispute with a shop regarding an order, we encourage you to contact the shop directly first. You may also reach out to us via our <a href="contact.html">Contact Us</a> page for assistance.</p>
+
+    <h2>8. Prohibited Use</h2>
+    <p>You may not use Shop-Paltform to list illegal products, misrepresent products or pricing, impersonate another person or business, or attempt to disrupt or misuse the platform's systems.</p>
+
+    <h2>9. Limitation of Liability</h2>
+    <p>Shop-Paltform provides the platform "as is" and is not responsible for the quality, safety, legality, or delivery of products listed by shop owners, or for payment disputes between customers and shop owners. We aim to keep the platform running smoothly but do not guarantee uninterrupted availability.</p>
+
+    <h2>10. Changes to These Terms</h2>
+    <p>We may update these Terms &amp; Conditions from time to time as the platform grows. Continued use of Shop-Paltform after changes are posted means you accept the updated terms.</p>
+
+    <h2>11. Contact</h2>
+    <p>Questions about these terms? Reach out through our <a href="contact.html">Contact Us</a> page.</p>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">Shop-Paltform</span>
+    <a href="index.html">Home</a> ·
+    <a href="about.html">About Us</a> ·
+    <a href="contact.html">Contact Us</a> ·
+    <a href="terms.html">Terms &amp; Conditions</a> ·
+    <a href="privacy-policy.html">Privacy Policy</a> ·
+    <a href="faq.html">FAQ</a>
+  </footer>
+
+  <script>
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+    const accountBar = document.getElementById('account-bar');
+    if (loggedInCustomer) {
+      accountBar.innerHTML = `<p>Hi, ${loggedInCustomer.name}! <a href="my-orders.html">My Orders</a> | <a href="index.html">Home</a></p>`;
+    } else {
+      accountBar.innerHTML = `<p><a href="customer-login.html">Customer Login</a> | <a href="login.html">Shop Owner Login</a> | <a href="index.html">Home</a></p>`;
+    }
+  </script>
+
+</body>
+</html>
