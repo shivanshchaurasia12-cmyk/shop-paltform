@@ -11,6 +11,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "cloudinary": "^2.5.1",
+    "dotenv": "^16.4.5",
     "express": "^5.2.1",
     "multer": "^2.2.0",
     "pdfkit": "^0.19.1"
