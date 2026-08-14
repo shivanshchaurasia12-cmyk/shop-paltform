@@ -3,9 +3,11 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
+const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -15,22 +17,34 @@ const PRODUCTS_FILE  = path.join(__dirname, 'products.json');
 const ORDERS_FILE    = path.join(__dirname, 'orders.json');
 const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
 
-const uploadDir     = path.join(__dirname, 'public', 'uploads');
-const qrUploadDir   = path.join(__dirname, 'public', 'uploads', 'qr');
-const avatarUploadDir = path.join(__dirname, 'public', 'uploads', 'avatars');
-
-[uploadDir, qrUploadDir, avatarUploadDir].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// ===== CLOUDINARY (persistent image storage) =====
+// Reads credentials from environment variables — set these in Render's
+// dashboard under your service's "Environment" tab. Never hardcode them here.
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const makeStorage = (dest) => multer.diskStorage({
-  destination: (req, file, cb) => cb(null, dest),
-  filename:    (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-});
+// multer now keeps the file in memory instead of writing to disk,
+// so nothing touches Render's local (ephemeral) filesystem.
+const upload       = multer({ storage: multer.memoryStorage() });
+const uploadQR     = multer({ storage: multer.memoryStorage() });
+const uploadAvatar = multer({ storage: multer.memoryStorage() });
 
-const upload       = multer({ storage: makeStorage(uploadDir) });
-const uploadQR     = multer({ storage: makeStorage(qrUploadDir) });
-const uploadAvatar = multer({ storage: makeStorage(avatarUploadDir) });
+// Uploads a file buffer to Cloudinary and resolves with its public URL.
+function uploadToCloudinary(fileBuffer, folder) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    stream.end(fileBuffer);
+  });
+}
 
 function readJSON(file, fallback = '[]') {
   if (!fs.existsSync(file)) fs.writeFileSync(file, fallback);
@@ -64,20 +78,28 @@ app.get('/api/shops', (req, res) => {
   res.json(active);
 });
 
-app.post('/api/shops', uploadAvatar.single('avatar'), (req, res) => {
-  const shops = readShops();
-  const newShop = {
-    id: Date.now(),
-    name: req.body.name,
-    owner: req.body.owner,
-    password: req.body.password,
-    active: true,
-    qrImage: null,
-    avatar: req.file ? '/uploads/avatars/' + req.file.filename : null
-  };
-  shops.push(newShop);
-  saveShops(shops);
-  res.json({ message: 'Shop registered!', shop: { id: newShop.id, name: newShop.name } });
+app.post('/api/shops', uploadAvatar.single('avatar'), async (req, res) => {
+  try {
+    const shops = readShops();
+    const avatarUrl = req.file
+      ? await uploadToCloudinary(req.file.buffer, 'shop-platform/avatars')
+      : null;
+    const newShop = {
+      id: Date.now(),
+      name: req.body.name,
+      owner: req.body.owner,
+      password: req.body.password,
+      active: true,
+      qrImage: null,
+      avatar: avatarUrl
+    };
+    shops.push(newShop);
+    saveShops(shops);
+    res.json({ message: 'Shop registered!', shop: { id: newShop.id, name: newShop.name } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
 });
 
 app.post('/api/login', (req, res) => {
@@ -97,39 +119,61 @@ app.patch('/api/shops/:id', (req, res) => {
   res.json({ message: 'Shop deactivated', shop });
 });
 
-app.post('/api/shops/:id/qr', uploadQR.single('qrImage'), (req, res) => {
-  const shops = readShops();
-  const shop = shops.find(s => s.id === parseInt(req.params.id));
-  if (!shop) return res.status(404).json({ message: 'Shop not found' });
-  if (req.file) shop.qrImage = '/uploads/qr/' + req.file.filename;
-  saveShops(shops);
-  res.json({ message: 'QR uploaded!', shop });
+app.post('/api/shops/:id/qr', uploadQR.single('qrImage'), async (req, res) => {
+  try {
+    const shops = readShops();
+    const shop = shops.find(s => s.id === parseInt(req.params.id));
+    if (!shop) return res.status(404).json({ message: 'Shop not found' });
+    if (req.file) {
+      shop.qrImage = await uploadToCloudinary(req.file.buffer, 'shop-platform/qr');
+    }
+    saveShops(shops);
+    res.json({ message: 'QR uploaded!', shop });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
 });
 
-app.post('/api/shops/:id/avatar', uploadAvatar.single('avatar'), (req, res) => {
-  const shops = readShops();
-  const shop = shops.find(s => s.id === parseInt(req.params.id));
-  if (!shop) return res.status(404).json({ message: 'Shop not found' });
-  if (req.file) shop.avatar = '/uploads/avatars/' + req.file.filename;
-  saveShops(shops);
-  res.json({ message: 'Avatar updated!', shop });
+app.post('/api/shops/:id/avatar', uploadAvatar.single('avatar'), async (req, res) => {
+  try {
+    const shops = readShops();
+    const shop = shops.find(s => s.id === parseInt(req.params.id));
+    if (!shop) return res.status(404).json({ message: 'Shop not found' });
+    if (req.file) {
+      shop.avatar = await uploadToCloudinary(req.file.buffer, 'shop-platform/avatars');
+    }
+    saveShops(shops);
+    res.json({ message: 'Avatar updated!', shop });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
 });
 
 // ===== PRODUCT ROUTES =====
 
-app.post('/api/products', upload.single('image'), (req, res) => {
-  const products = readProducts();
-  const newProduct = {
-    id: Date.now(),
-    shopId: parseInt(req.body.shopId),
-    name: req.body.name,
-    price: req.body.price,
-    quantity: req.body.quantity,
-    image: req.file ? '/uploads/' + req.file.filename : ''
-  };
-  products.push(newProduct);
-  saveProducts(products);
-  res.json({ message: 'Product added!', product: newProduct });
+app.post('/api/products', upload.single('image'), async (req, res) => {
+  try {
+    const products = readProducts();
+    const imageUrl = req.file
+      ? await uploadToCloudinary(req.file.buffer, 'shop-platform/products')
+      : '';
+    const newProduct = {
+      id: Date.now(),
+      shopId: parseInt(req.body.shopId),
+      name: req.body.name,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      image: imageUrl
+    };
+    products.push(newProduct);
+    saveProducts(products);
+    res.json({ message: 'Product added!', product: newProduct });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
 });
 
 app.get('/api/products/:shopId', (req, res) => {
