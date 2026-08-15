@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4321882047594138" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ - Shop-Paltform</title>
+  <meta name="description" content="Frequently asked questions about buying, selling, payments, and orders on Shop-Paltform.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="account-bar"></div>
+
+  <div class="page-content">
+    <h1>Frequently Asked Questions</h1>
+    <p class="subtitle">Quick answers about buying and selling on Shop-Paltform.</p>
+
+    <h2>For Customers</h2>
+
+    <div class="faq-item">
+      <h3>How do I place an order?</h3>
+      <p>Browse the list of shops on the homepage, click into a shop to see its products, and select the item you want to buy. Fill in your name, phone number, and delivery address, and submit the order. You'll receive an order confirmation with a downloadable PDF receipt.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do I pay for my order?</h3>
+      <p>Each shop owner has their own UPI QR code, which is shown when you place an order. You scan it with any UPI app (Google Pay, PhonePe, Paytm, etc.) and pay the shop directly. Shop-Paltform does not process the payment itself.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Do I need an account to order?</h3>
+      <p>Yes, customers need to register with a name, phone number, and password. This lets you track your past orders under "My Orders."</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Can I cancel or return an order?</h3>
+      <p>Cancellations and returns are handled directly with the shop owner, since each shop manages its own inventory and fulfillment. Contact the shop as soon as possible if you need to change or cancel an order.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do I track my order?</h3>
+      <p>Log in and visit the "My Orders" page to see all orders you've placed, along with their status.</p>
+    </div>
+
+    <h2>For Shop Owners</h2>
+
+    <div class="faq-item">
+      <h3>How do I list my shop and products?</h3>
+      <p>Register as a shop owner, then log in to your dashboard. From there you can add products with a name, price, stock quantity, and photo, and upload your UPI QR code so customers can pay you directly.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Is there a fee to sell on Shop-Paltform?</h3>
+      <p>No listing or commission fees are charged to register a shop or list products. Payments go directly from the customer to you via your UPI QR code.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do I see my orders?</h3>
+      <p>Your shop dashboard shows every order placed with your shop, including the customer's name, phone number, and delivery address, so you can prepare and deliver it.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Can I update my product details after listing them?</h3>
+      <p>Yes, you can update your product information, stock, and images any time from your shop dashboard.</p>
+    </div>
+
+    <h2>Still Have Questions?</h2>
+    <p>If you didn't find what you're looking for, reach out through our <a href="contact.html">Contact Us</a> page and we'll get back to you.</p>
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-brand">Shop-Paltform</span>
+    <a href="index.html">Home</a> ·
+    <a href="about.html">About Us</a> ·
+    <a href="contact.html">Contact Us</a> ·
+    <a href="terms.html">Terms &amp; Conditions</a> ·
+    <a href="privacy-policy.html">Privacy Policy</a> ·
+    <a href="faq.html">FAQ</a>
+  </footer>
+
+  <script>
+    const loggedInCustomer = JSON.parse(sessionStorage.getItem('loggedInCustomer'));
+    const accountBar = document.getElementById('account-bar');
+    if (loggedInCustomer) {
+      accountBar.innerHTML = `<p>Hi, ${loggedInCustomer.name}! <a href="my-orders.html">My Orders</a> | <a href="index.html">Home</a></p>`;
+    } else {
+      accountBar.innerHTML = `<p><a href="customer-login.html">Customer Login</a> | <a href="login.html">Shop Owner Login</a> | <a href="index.html">Home</a></p>`;
+    }
+  </script>
+
+</body>
+</html>
